@@ -1,0 +1,12 @@
+CREATE TABLE book(
+ id serial PRIMARY KEY,
+ title VARCHAR (50) NOT NULL,
+ author VARCHAR (50) NOT NULL,
+ publication VARCHAR (355) NOT NULL,
+ year integer NOT NULL,
+ created_on TIMESTAMP NOT NULL
+);
+
+ALTER TABLE book ALTER COLUMN created_on SET DEFAULT current_timestamp;
+
+INSERT INTO book(title,author,publication,year) values ('Meditation','Devraj','SChand',2018);
