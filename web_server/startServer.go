@@ -10,16 +10,19 @@ import (
 	"strconv"
 )
 
-func StartServer() error {
+
+type Controller struct {}
+
+func (c *Controller) StartServer() error {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/ping", ping).Methods("GET")
+	router.HandleFunc("/ping", c.ping).Methods("GET")
 
-	router.HandleFunc("/books", getBooks).Methods("GET")
-	router.HandleFunc("/books/{id}", getBook).Methods("GET")
-	router.HandleFunc("/books", addBook).Methods("POST")
-	router.HandleFunc("/books", updateBook).Methods("PUT")
-	router.HandleFunc("/books/{id}", removeBook).Methods("DELETE")
+	router.HandleFunc("/books", c.getBooks).Methods("GET")
+	router.HandleFunc("/books/{id}", c.getBook).Methods("GET")
+	router.HandleFunc("/books", c.addBook).Methods("POST")
+	router.HandleFunc("/books", c.updateBook).Methods("PUT")
+	router.HandleFunc("/books/{id}", c.removeBook).Methods("DELETE")
 
 	err := http.ListenAndServe(":8080", router)
 	if err != nil {
@@ -29,11 +32,11 @@ func StartServer() error {
 	return nil
 }
 
-func ping(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) ping(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode("pong")
 }
 
-func getBooks(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) getBooks(w http.ResponseWriter, r *http.Request) {
 	glog.Info("Getting list of all books..")
 	books, err := db.GetBooks()
 	if err != nil {
@@ -43,7 +46,7 @@ func getBooks(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(&books)
 }
 
-func getBook(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) getBook(w http.ResponseWriter, r *http.Request) {
 	glog.Info("Getting a book with id:")
 	params := mux.Vars(r) // Get params in form of map.
 	id,err := strconv.Atoi(params["id"])
@@ -58,7 +61,7 @@ func getBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(book)
 }
 
-func addBook(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) addBook(w http.ResponseWriter, r *http.Request) {
 	glog.Info("Adding book into DB")
 	var book models.Book
 	err := json.NewDecoder(r.Body).Decode(&book)
@@ -74,7 +77,7 @@ func addBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(id)
 }
 
-func updateBook(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) updateBook(w http.ResponseWriter, r *http.Request) {
 	glog.Info("Updating book")
 	var book models.Book
 	err := json.NewDecoder(r.Body).Decode(&book)
@@ -89,7 +92,7 @@ func updateBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(rowsAffected)
 }
 
-func removeBook(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) removeBook(w http.ResponseWriter, r *http.Request) {
 	glog.Info("removing book..")
 	params := mux.Vars(r)
 	id,err := strconv.Atoi(params["id"])
